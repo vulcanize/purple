@@ -2,13 +2,13 @@
 let
   hostNixpkgs = import <nixpkgs> {};
 
-  pinnedNixpkgs = builtins.fetchTarball {
-    name = "release-19.09";
-    url = https://github.com/nixos/nixpkgs/archive/64a3ccb852d4f34abb015503affd845ef03cc0d9.tar.gz;
-    sha256 = "0jigsyxlwl5hmsls4bqib0rva41biki6mwnswgmigwq41v6q7k94";
-  };
-
   sources = {
+    pinnedNixpkgs = builtins.fetchTarball {
+      name = "release-19.09";
+      url = https://github.com/nixos/nixpkgs/archive/64a3ccb852d4f34abb015503affd845ef03cc0d9.tar.gz;
+      sha256 = "0jigsyxlwl5hmsls4bqib0rva41biki6mwnswgmigwq41v6q7k94";
+    };
+
     dapptools = hostNixpkgs.fetchFromGitHub {
       owner = "dapphub";
       repo = "dapptools";
@@ -17,7 +17,7 @@ let
       fetchSubmodules = true;
     };
 
-    gitignore = pkgs.fetchFromGitHub {
+    gitignore = hostNixpkgs.fetchFromGitHub {
       owner = "hercules-ci";
       repo = "gitignore";
       rev = "f9e996052b5af4032fe6150bba4a6fe4f7b9d698";
@@ -40,7 +40,7 @@ let
               sha256 = "1d08qsgz7i3ndfknc5nx9kvzjl1pm7is2cwi6i6h1gd4shdhz5yy";
             } {};
 
-            mkrfuzz = pkgs.haskellPackages.callCabal2nix "mkrfuzz" sources.mkrfuzz {};
+            mkrfuzz = self.callCabal2nix "mkrfuzz" sources.mkrfuzz {};
           });
       });
   };
@@ -50,7 +50,7 @@ let
     overlay
   ];
 
-  pkgs = import pinnedNixpkgs { inherit overlays; };
+  pkgs = import sources.pinnedNixpkgs { inherit overlays; };
 
 in {
   inherit pkgs overlays;
