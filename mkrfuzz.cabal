@@ -57,4 +57,3 @@ executable dai
     optparse-generic
   main-is:
     Main.hs
-  

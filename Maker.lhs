@@ -620,7 +620,10 @@ an ilk.
 >   _ <- look (ilks . ix id_ilk)
 
 >  -- Create a CDP with the sender as owner
->   Account id_lad <- use sender
+>   id_sender <- use sender
+>   id_lad <- case id_sender of
+>     Account id_lad -> return id_lad
+>     _ -> throwError (AssertError ?act)
 >   initialize (urns . at id_urn) (emptyUrn id_ilk id_lad)
 
 <p>The owner of an urn can transfer its ownership at any time using
