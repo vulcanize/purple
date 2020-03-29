@@ -39,20 +39,19 @@ let
               ver = "0.46";
               sha256 = "1d08qsgz7i3ndfknc5nx9kvzjl1pm7is2cwi6i6h1gd4shdhz5yy";
             } {};
+
+            mkrfuzz = pkgs.haskellPackages.callCabal2nix "mkrfuzz" sources.mkrfuzz {};
           });
       });
   };
 
-  pkgs = import pinnedNixpkgs {
-    overlays = [
-      overlay
-      (import (sources.dapptools + /overlay.nix))
-    ];
-  };
+  overlays = [
+    overlay
+    (import (sources.dapptools + /overlay.nix))
+  ];
+
+  pkgs = import pinnedNixpkgs { inherit overlays; };
 
 in {
-  inherit pkgs;
-  packages = {
-    mkrfuzz = pkgs.haskellPackages.callCabal2nix "mkrfuzz" sources.mkrfuzz {};
-  };
+  inherit pkgs overlays;
 }

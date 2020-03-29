@@ -1,7 +1,7 @@
 {}:
-let project = (import ./project.nix {});
-in with project; pkgs.haskellPackages.shellFor {
+let pkgs = (import ./project.nix {}).pkgs;
+in with pkgs.haskellPackages; shellFor {
   withHoogle = true;
-  packages = p: [ packages.mkrfuzz ];
-  nativeBuildInputs = with pkgs.haskellPackages; [ cabal-install ghcid hlint hoogle ];
+  packages = p: [ p.mkrfuzz ];
+  nativeBuildInputs = [ cabal-install ghcid hlint hoogle ];
 }
