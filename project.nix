@@ -46,8 +46,8 @@ let
   };
 
   overlays = [
-    overlay
     (import (sources.dapptools + /overlay.nix))
+    overlay
   ];
 
   pkgs = import pinnedNixpkgs { inherit overlays; };
