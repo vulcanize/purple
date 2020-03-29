@@ -8,13 +8,26 @@ let
     sha256 = "0jigsyxlwl5hmsls4bqib0rva41biki6mwnswgmigwq41v6q7k94";
   };
 
-  dapptools = hostNixpkgs.fetchFromGitHub {
-    owner = "dapphub";
-    repo = "dapptools";
-    rev = "af84e2ee0a0654fdaa91186384233cf1731ee7ce";
-    sha256 = "1zqqwbhpk1idi4x0lcgcpfxxcfpiyq9bgbgwfsk7yzkk6q3j1z6k";
-    fetchSubmodules = true;
+  sources = {
+    dapptools = hostNixpkgs.fetchFromGitHub {
+      owner = "dapphub";
+      repo = "dapptools";
+      rev = "af84e2ee0a0654fdaa91186384233cf1731ee7ce";
+      sha256 = "1zqqwbhpk1idi4x0lcgcpfxxcfpiyq9bgbgwfsk7yzkk6q3j1z6k";
+      fetchSubmodules = true;
+    };
+
+    gitignore = pkgs.fetchFromGitHub {
+      owner = "hercules-ci";
+      repo = "gitignore";
+      rev = "f9e996052b5af4032fe6150bba4a6fe4f7b9d698";
+      sha256 = "0jrh5ghisaqdd0vldbywags20m2cxpkbbk5jjjmwaw0gr8nhsafv";
+    };
+
+    mkrfuzz = gitignoreSource ./.;
   };
+
+  gitignoreSource = (import sources.gitignore {}).gitignoreSource;
 
   overlay = self: super: {
     haskellPackages =
@@ -33,15 +46,13 @@ let
   pkgs = import pinnedNixpkgs {
     overlays = [
       overlay
-      (import (dapptools + /overlay.nix))
+      (import (sources.dapptools + /overlay.nix))
     ];
   };
-
-  mkrfuzz = pkgs.haskellPackages.callCabal2nix "mkrfuzz" ./. {};
 
 in {
   inherit pkgs;
   packages = {
-    inherit mkrfuzz;
+    mkrfuzz = pkgs.haskellPackages.callCabal2nix "mkrfuzz" sources.mkrfuzz {};
   };
 }
