@@ -231,7 +231,7 @@ briefly explains each imported type and function.
 <todo>Render the prelude.</todo>
 
 > module Maker where
->
+
 > import Prelude (); import Maker.Prelude; import Maker.Decimal
 
 <!--
@@ -265,7 +265,7 @@ us to combine them without explicit conversion.
 
 > newtype Wad = Wad (Decimal E18)
 >   deriving (Ord, Eq, Num, Real, Fractional, RealFrac)
->
+
 > newtype Ray = Ray (Decimal E36)
 >   deriving (Ord, Eq, Num, Real, Fractional, RealFrac)
 
@@ -282,7 +282,7 @@ the other.
 >   readsPrec n s = fmap (first Wad) (readsPrec n s)
 > instance Read Sec where
 >   readsPrec n s = fmap (first Sec) (readsPrec n s)
->
+
 > instance Show Wad  where show (Wad x)  = show x
 > instance Show Ray  where show (Ray x)  = show x
 > instance Show Sec  where show (Sec x)  = show x
@@ -315,19 +315,19 @@ the other.
 <p>The system makes use of four basic types of tokens.
 
 > data Token
->
+
 >     -- Some collateral token approved by system governance
 >   = Gem (Id Tag)
->
+
 >     -- Fungible stablecoin, issued by CDP owners and traded publicly
 >   | DAI
->
+
 >     -- Internal anticoin whose quantity is always equal to total issued dai
 >   | SIN
->
+
 >     -- Volatile countercoin and voting token
 >   | MKR
->
+
 >   deriving (Eq, Ord, Show)
 
 <p>The system's approved collateral tokens are called "gems". We use
@@ -344,13 +344,13 @@ tokens are well-behaved before approving them.
 <code>Tag</code> records.
 
 > data Tag = Tag {
->
+
 >   -- Latest token market price (denominated in SDR)
 >   _tag :: Wad,
->
+
 >   -- Timestamp after which price should be considered stale
 >   _zzz :: Sec
->
+
 > } deriving (Eq, Show)
 
 <h2><code>Urn</code>: CDP record</h2>
@@ -358,22 +358,22 @@ tokens are well-behaved before approving them.
 <p>An <code>Urn</code> record keeps track of one CDP.
 
 > data Urn = Urn {
->
+
 >   -- CDP type identifier
 >   _ilk  :: Id Ilk,
->
+
 >   -- CDP owner
 >   _lad  :: Address,
->
+
 >   -- Amount of outstanding dai issued by this CDP, denominated in debt unit
 >   _art  :: Wad,
->
+
 >   -- Amount of collateral currently locked by this CDP
 >   _ink  :: Wad,
->
+
 >   -- Actor that triggered liquidation, if applicable
 >   _cat  :: Maybe Actor
->
+
 > } deriving (Eq, Show)
 
 <h2><code>Ilk</code>: CDP type record</h2>
@@ -381,34 +381,34 @@ tokens are well-behaved before approving them.
 <p>An <code>Ilk</code> record keeps track of one CDP type.
 
 > data Ilk = Ilk {
->
+
 >   -- Token used as collateral for CDPs of this type
 >   _gem :: Id Tag,
->
+
 >   -- Total debt owed by CDPs of this type, denominated in debt unit
 >   _rum :: Wad,
->
+
 >   -- Current dai value of debt unit, increasing according to stability fee
 >   _chi :: Ray,
->
+
 >   -- Debt ceiling: maximum total outstanding dai value that can be issued by this CDP type
 >   _hat :: Wad,
->
+
 >   -- Liquidation ratio (collateral value per dai value)
 >   _mat :: Ray,
->
+
 >   -- Liquidation penalty (fraction of dai)
 >   _axe :: Ray,
->
+
 >   -- Fee (per-second fraction of dai)
 >   _tax :: Ray,
->
+
 >   -- Grace period of price feed unavailability
 >   _lax :: Sec,
->
+
 >   -- Timestamp of latest debt unit adjustment
 >   _rho :: Sec
->
+
 > } deriving (Eq, Show)
 
 <h2><code>Vox</code>: feedback mechanism record</h2>
@@ -418,22 +418,22 @@ adjusts the target price of dai based on market price. Its data is
 grouped in a record called <code>Vox</code>.
 
 > data Vox = Vox {
->
+
 >   -- Dai market price denominated in SDR
 >   _wut :: Wad,
->
+
 >   -- Dai target price denominated in SDR
 >   _par :: Wad,
->
+
 >   -- Current per-second change in target price
 >   _way :: Ray,
->
+
 >   -- Sensitivity parameter (set by governance)
 >   _how :: Ray,
->
+
 >   -- Timestamp of latest feedback iteration
 >   _tau :: Sec
->
+
 > } deriving (Eq, Show)
 
 <h2><code>Actor</code>: account identifier</h2>
@@ -442,34 +442,34 @@ grouped in a record called <code>Vox</code>.
 that can hold a token balance or invoke actions.
 
 > data Actor
->
+
 >     -- Extern address (CDP owner)
 >   = Account Address
->
+
 >     -- Collateral vault, holds all locked collateral until liquidation
 >   | Jar
->
+
 >     -- DAI and SIN are minted and burned by the "jug"
 >   | Jug
->
+
 >     -- The settler component
 >   | Vow
->
+
 >     -- The collateral auctioneer that raises DAI to cover liquidations
 >   | Flipper
->
+
 >     -- The "buy and burn" auctioneer that spends fee revenue on buying MKR
 >   | Flapper
->
+
 >     -- The "inflate and sell" auctioneer that mints MKR to cover liquidations
 >   | Flopper
->
+
 >     -- Test driver (not present in real system)
 >   | Toy
->
+
 >     -- Omnipotent actor (temporary kludge)
 >   | God
->
+
 >   deriving (Eq, Ord, Show)
 
 
@@ -495,34 +495,34 @@ that can hold a token balance or invoke actions.
 <p>Finally we define the overall state of the model.
 
 > data System = System {
->
+
 >   -- Feedback mechanism data
 >   _vox      :: Vox,
->
+
 >   -- CDP records
 >   _urns     :: Map (Id Urn) Urn,
->
+
 >   -- CDP type records
 >   _ilks     :: Map (Id Ilk) Ilk,
->
+
 >   -- Price tags of collateral tokens
 >   _tags     :: Map (Id Tag) Tag,
->
+
 >   -- Token balances by actor and token
 >   _balances :: Map (Actor, Token) Wad,
->
+
 >   -- Current timestamp
 >   _era      :: Sec,
->
+
 >   -- Settler operation mode
 >   _mode     :: Mode,
->
+
 >   -- Sender of current action
 >   _sender   :: Actor,
->
+
 >   -- All user accounts (for tests)
 >   _accounts :: [Address]
->
+
 > } deriving (Eq, Show)
 
 > -- Settler-related work in progress
@@ -541,20 +541,20 @@ that can hold a token balance or invoke actions.
 
 > instance HasResolution a => ToJSON (Decimal a) where
 >   toJSON (D x) = toJSON (show x)
->
+
 > instance HasResolution a => FromJSON (Decimal a) where
 >   parseJSON v = fmap (D . read) (parseJSON v)
->
+
 > instance ToJSON Sec where
 >   toJSON (Sec x) = toJSON (show x)
->
+
 > instance FromJSON Sec where
 >   parseJSON v = fmap (Sec . read) (parseJSON v)
->
+
 > instance ToJSONKey Token ; instance FromJSONKey Token
 > instance ToJSONKey Actor ; instance FromJSONKey Actor
 > instance ToJSONKey (Id a) ; instance FromJSONKey (Id a)
->
+
 > instance ToJSON Wad
 > instance FromJSON Wad
 > instance ToJSON Ray
@@ -612,13 +612,13 @@ rollback, see chapter&nbsp;\ref{chapter:monad}.
 an ilk.
 
 > open id_urn id_ilk = do
->
+
 >  -- Fail if account identifier is taken
 >   none (urns . ix id_urn)
->
+
 >  -- Fail if ilk type is not present
 >   _ <- look (ilks . ix id_ilk)
->
+
 >  -- Create a CDP with the sender as owner
 >   Account id_lad <- use sender
 >   initialize (urns . at id_urn) (emptyUrn id_ilk id_lad)
@@ -627,11 +627,11 @@ an ilk.
 <code>give</code>.
 
 > give id_urn id_lad = do
->
+
 >  -- Fail if sender is not the CDP owner
 >   id_sender <- use sender
 >   owns id_urn id_sender
->
+
 >  -- Transfer CDP ownership
 >   assign (urns . ix id_urn . lad) id_lad
 
@@ -639,21 +639,21 @@ an ilk.
 lock more collateral.
 
 > lock id_urn wad_gem = do
->
+
 >  -- Fail if sender is not the CDP owner
 >   id_lad <- use sender
 >   owns id_urn id_lad
->
+
 >  -- Fail if liquidation in process
 >   want (feel id_urn) (not . oneOf [Grief, Dread])
->
+
 >  -- Identify collateral token
 >   id_ilk  <- look (urns . ix id_urn . ilk)
 >   id_tag  <- look (ilks . ix id_ilk . gem)
->
+
 >  -- Take custody of collateral
 >   transfer (Gem id_tag) wad_gem id_lad Jar
->
+
 >  -- Record an collateral token balance increase
 >   increase (urns . ix id_urn . ink) wad_gem
 
@@ -663,17 +663,17 @@ amount of collateral, as long as this would not take the CDP below its
 liquidation ratio.
 
 > free id_urn wad_gem = do
->
+
 >  -- Fail if sender is not the CDP owner
 >   id_lad <- use sender
 >   owns id_urn id_lad
->
+
 >  -- Record a collateral token balance decrease
 >   decrease (urns . ix id_urn . ink) wad_gem
->
+
 >  -- Roll back on any risk problem except ilk ceiling excess
 >   want (feel id_urn) (oneOf [Pride, Anger])
->
+
 >  -- Release custody of collateral
 >   id_ilk <- look (urns . ix id_urn . ilk)
 >   id_tag <- look (ilks . ix id_ilk . gem)
@@ -685,30 +685,30 @@ ceiling is not exceeded and the issuance would not take the CDP below
 its liquidation ratio.
 
 > draw id_urn wad_dai = do
->
+
 >  -- Fail if sender is not the CDP owner
 >   id_lad <- use sender
 >   owns id_urn id_lad
->
+
 >  -- Update debt unit and unprocessed fee revenue
 >   id_ilk <- look (urns . ix id_urn . ilk)
 >   chi1 <- drip id_ilk
->
+
 >  -- Denominate issuance quantity in debt unit
 >   let wad_chi = wad_dai / cast chi1
->
+
 >  -- Record increase of CDP's stablecoin issuance
 >   increase (urns . ix id_urn . art) wad_chi
->
+
 >  -- Record increase of ilk's stablecoin issuance
 >   increase (ilks . ix id_ilk . rum) wad_chi
->
+
 >  -- Roll back on any risk problem
 >   want (feel id_urn) (== Pride)
->
+
 >  -- Mint both stablecoin and anticoin
 >   lend wad_dai
->
+
 >  -- Transfer stablecoin to CDP owner
 >   transfer DAI wad_dai Jug id_lad
 
@@ -716,30 +716,30 @@ its liquidation ratio.
 <code>wipe</code> to send back dai and reduce the CDP's issuance.
 
 > wipe id_urn wad_dai = do
->
+
 >  -- Fail if sender is not the CDP owner
 >   id_lad <- use sender
 >   owns id_urn id_lad
->
+
 >  -- Fail if CDP is in liquidation
 >   want (feel id_urn) (not . oneOf [Grief, Dread])
->
+
 >  -- Update debt unit and unprocessed fee revenue
 >   id_ilk <- look (urns . ix id_urn . ilk)
 >   chi1 <- drip id_ilk
->
+
 >  -- Denominate stablecoin amount in debt unit
 >   let wad_chi = wad_dai / cast chi1
->
+
 >  -- Record decrease of CDP issuance
 >   decrease (urns . ix id_urn . art) wad_chi
->
+
 >  -- Record decrease of ilk total issuance
 >   decrease (ilks . ix id_ilk . rum) wad_chi
->
+
 >  -- Take custody of stablecoin from CDP owner
 >   transfer DAI wad_dai id_lad Jar
->
+
 >  -- Destroy stablecoin and anticoin
 >   mend wad_dai
 
@@ -748,19 +748,19 @@ the price feed is up to date and the CDP is not in liquidation.
 This reclaims all collateral and cancels all issuance plus fee.
 
 > shut id_urn = do
->
+
 >  -- Update debt unit and unprocessed fee revenue
 >   id_ilk <- look (urns . ix id_urn . ilk)
 >   chi1 <- drip id_ilk
->
+
 >  -- Reverse all issued stablecoin plus fee
 >   art0 <- look (urns . ix id_urn . art)
 >   wipe id_urn (art0 * cast chi1)
->
+
 >  -- Reclaim all locked collateral
 >   ink0 <- look (urns . ix id_urn . ink)
 >   free id_urn ink0
->
+
 >  -- Nullify CDP record
 >   assign (urns . at id_urn) Nothing
 
@@ -769,25 +769,25 @@ This reclaims all collateral and cancels all issuance plus fee.
 <p>We define six stages of a CDP's lifecycle.
 
 > data Stage
->
+
 >     -- Overcollateralized, CDP type below debt ceiling, fresh price tag, liquidation not triggered
 >   = Pride
->
+
 >     -- Debt ceiling reached for CDP's type
 >   | Anger
->
+
 >     -- CDP type's collateral price feed in limbo
 >   | Worry
->
+
 >     -- CDP undercollateralized, or CDP type's price limbo grace period exceeded
 >   | Panic
->
+
 >     -- Liquidation triggered
 >   | Grief
->
+
 >     -- Liquidation triggered and started
 >   | Dread
->
+
 >   deriving (Eq, Show)
 
 <!--
@@ -838,23 +838,23 @@ during liquidation.
 lifecycle stage of a CDP.
 
 > analyze era0 par0 urn0 ilk0 tag0 =
->
+
 >   let
->
+
 >    -- Value of urn's locked collateral in SDR:
 >     pro = view ink urn0 * view tag tag0
->
+
 >    -- CDP's issuance denominated in SDR:
 >     con = view art urn0 * cast (view chi ilk0) * par0
->
+
 >    -- Required collateral value as per liquidation ratio:
 >     min = con * cast (view mat ilk0)
->
+
 >    -- CDP type's total DAI issuance:
 >     cap = view rum ilk0 * cast (view chi ilk0)
->
+
 >   in if
->
+
 >     -- Cases checked in order:
 >     | has cat urn0 && view ink urn0 == 0    -> Dread
 >     | has cat urn0                          -> Grief
@@ -906,21 +906,21 @@ value of <code>analyze</code> after ensuring that the system state
 is updated.
 
 > feel id_urn = do
->
+
 >  -- Adjust target price and target rate
 >   prod
->
+
 >  -- Update debt unit and unprocessed fee revenue
 >   id_ilk <- look (urns . ix id_urn . ilk)
 >   drip id_ilk
->
+
 >  -- Read parameters for stage analysis
 >   era0 <- use era
 >   par0 <- use (vox . par)
 >   urn0 <- look (urns . ix id_urn)
 >   ilk0 <- look (ilks . ix (view ilk urn0))
 >   tag0 <- look (tags . ix (view gem ilk0))
->
+
 >  -- Return lifecycle stage of CDP
 >   return (analyze era0 par0 urn0 ilk0 tag0)
 
@@ -935,7 +935,7 @@ can be invoked at any time by keepers, but is also invoked as a side
 effect of any CDP act that uses <code>feel</code> to assess risk.
 
 > prod = do
->
+
 >  -- Read all parameters relevant for feedback mechanism
 >   era0 <- use era
 >   tau0 <- use (vox . tau)
@@ -943,30 +943,30 @@ effect of any CDP act that uses <code>feel</code> to assess risk.
 >   par0 <- use (vox . par)
 >   how0 <- use (vox . how)
 >   way0 <- use (vox . way)
->
+
 >   let
 >    -- Time difference in seconds
 >     age  = era0 - tau0
->
+
 >    -- Current target rate applied to target price
 >     par1  = par0 * cast (way0 ^^ age)
->
+
 >    -- Sensitivity parameter applied over time
 >     wag  = how0 * fromIntegral age
->
+
 >    -- Target rate scaled up or down
 >     way1  = inj (prj way0 +
 >                  if wut0 < par0 then wag else -wag)
->
+
 >  -- Update target price
 >   assign (vox . par) par1
->
+
 >  -- Update rate of price change
 >   assign (vox . way) way1
->
+
 >  -- Record time of update
 >   assign (vox . tau) era0
->
+
 >   where
 >    -- Convert between multiplicative and additive form
 >     prj x  = if x >= 1  then x - 1  else 1 - 1 / x
@@ -981,13 +981,13 @@ time by keepers, but is also called as a side effect of every act that
 uses <code>feel</code> to assess CDP risk.
 
 > drip id_ilk = do
->
+
 >   rho0  <- look (ilks . ix id_ilk . rho)
 >   tax0  <- look (ilks . ix id_ilk . tax)
 >   chi0  <- look (ilks . ix id_ilk . chi)
 >   rum0  <- look (ilks . ix id_ilk . rum)
 >   era0  <- use era
->
+
 >   let
 >    -- Time difference in seconds
 >     age   = era0 - rho0
@@ -995,16 +995,16 @@ uses <code>feel</code> to assess CDP risk.
 >     chi1  = chi0 * tax0 ^^ age
 >    -- Stability fee revenue denominated in new unit
 >     dew   = (cast (chi1 - chi0) :: Wad) * rum0
->
+
 >  -- Mint stablecoin and anticoin for marginally accrued fee
 >   lend dew
->
+
 >  -- Record time of update
 >   assign (ilks . ix id_ilk . rho) era0
->
+
 >  -- Record new debt unit
 >   assign (ilks . ix id_ilk . chi) chi1
->
+
 >  -- Return the new debt unit
 >   return chi1
 
@@ -1037,20 +1037,20 @@ This enables the settler contract
  and take over the anticoin.
 
 > bite id_urn = do
->
+
 >  -- Fail if CDP is not in the appropriate stage
 >   want (feel id_urn) (== Panic)
->
+
 >  -- Record the sender as the liquidation initiator
 >   id_cat <- use sender
 >   assign (urns . ix id_urn . cat) (Just id_cat)
->
+
 >  -- Apply liquidation penalty to CDP issuance
 >   id_ilk <- look (urns . ix id_urn . ilk)
 >   axe0 <- look (ilks . ix id_ilk . axe)
 >   art0 <- look (urns . ix id_urn . art)
 >   let art1 = art0 * cast axe0
->
+
 >  -- Update CDP issuance to include penalty
 >   assign (urns . ix id_urn . art) art1
 
@@ -1062,29 +1062,29 @@ and the anticoins
 corresponding to the CDP's issuance.
 
 > grab id_urn = auth $ do
->
+
 >  -- Fail if CDP is not marked for liquidation
 >   want (feel id_urn) (== Grief)
->
+
 >   ink0 <- look (urns . ix id_urn . ink)
 >   art0 <- look (urns . ix id_urn . art)
 >   id_ilk <- look (urns . ix id_urn . ilk)
 >   id_tag <- look (ilks . ix id_ilk . gem)
->
+
 >  -- Update the debt unit and unprocessed fee revenue
 >   chi1 <- drip id_ilk
->
+
 >  -- Denominate the issuance in dai
 >   let con = art0 * cast chi1
->
+
 >  -- Transfer collateral and anticoin to settler
 >   transfer (Gem id_tag) ink0 Jar Vow
 >   transfer SIN con Jug Vow
->
+
 >  -- Nullify CDP's collateral and anticoin quantities
 >   assign (urns . ix id_urn . ink) 0
 >   assign (urns . ix id_urn . art) 0
->
+
 >  -- Decrease the ilk's total issuance
 >   decrease (ilks . ix id_ilk . rum) art0
 
@@ -1093,19 +1093,19 @@ invokes <code>plop</code> to give back any collateral it did not need
 to sell and restore the CDP.
 
 > plop id_urn wad_dai = auth $ do
->
+
 >  -- Fail unless CDP is in the proper stage
 >   want (feel id_urn) (== Dread)
->
+
 >  -- Forget the CDP's initiator of liquidation
 >   assign (urns . ix id_urn . cat) Nothing
->
+
 >  -- Take excess collateral from settler to vault
 >   id_vow <- use sender
 >   id_ilk <- look (urns . ix id_urn . ilk)
 >   id_tag <- look (ilks . ix id_ilk . gem)
 >   transfer (Gem id_tag) wad_dai id_vow Jar
->
+
 >  -- Record the excess collateral as belonging to the CDP
 >   assign (urns . ix id_urn . ink) wad_dai
 
@@ -1115,10 +1115,10 @@ to claim all uncollected stability fee revenue
 for use in the countercoin buy-and-burn auction.
 
 > loot = auth $ do
->
+
 >  -- The dai vault's balance is the uncollected stability fee revenue
 >   wad <- look (balance DAI Jug)
->
+
 >  -- Transfer the entire dai vault balance to sender
 >   transfer DAI wad Jug Vow
 
@@ -1136,7 +1136,7 @@ dummies.</aside>
 >   vow <- look mode
 >   case vow of
 >     Dummy -> return ()
->
+
 > flop = do
 >   vow <- look mode
 >   case vow of
@@ -1145,34 +1145,34 @@ dummies.</aside>
 <h2>Settlement</h2>
 
 > tidy who = auth $ do
->
+
 >  -- Find the entity's stablecoin and anticoin balances
 >   awe <- look (balance DAI who)
 >   woe <- look (balance SIN who)
->
+
 >  -- We can burn at most the smallest of the two balances
 >   let x = min awe woe
->
+
 >  -- Transfer stablecoin and anticoin to the settler
 >   transfer DAI x who Vow
 >   transfer SIN x who Vow
->
+
 >  -- Burn both stablecoin and anticoin
 >   burn DAI x Vow
 >   burn SIN x Vow
 
 > kick = do
->
+
 >  -- Transfer unprocessed stability fee revenue to vow account
 >   loot
->
+
 >  -- Cancel stablecoin against anticoin
 >   tidy Vow
->
+
 >  -- Assign any remaining stablecoin to countercoin-deflating auction
 >   transferAll DAI Vow Flapper
 >   flap
->
+
 >  -- Assign any remaining anticoin to countercoin-inflating auction
 >   transferAll SIN Vow Flopper
 >   flop
@@ -1200,13 +1200,13 @@ liquidation penalty; <code>cork</code> for the ilk ceiling;
 
 > cuff id_ilk mat1 = auth $ do
 >   assign (ilks . ix id_ilk . mat) mat1
->
+
 > chop id_ilk axe1 = auth $ do
 >   assign (ilks . ix id_ilk . axe) axe1
->
+
 > cork id_ilk hat1 = auth $ do
 >   assign (ilks . ix id_ilk . hat) hat1
->
+
 > calm id_ilk lax1 = auth $ do
 >   assign (ilks . ix id_ilk . lax) lax1
 
@@ -1215,10 +1215,10 @@ that the previous stability fee has been accounted for in the internal
 debt unit.
 
 > crop id_ilk tax1 = auth $ do
->
+
 >  -- Apply the current stability fee to the internal debt unit
 >   drip id_ilk
->
+
 >  -- Change the stability fee
 >   assign (ilks . ix id_ilk . tax) tax1
 
@@ -1228,14 +1228,14 @@ debt unit.
 the concept of &raquo;allowance&laquo;).
 
 > transfer id_gem wad src dst =
->
+
 >  -- Operate in the token's balance table
 >   zoom balances $ do
->
+
 >  -- Fail if source balance insufficient
 >   balance <- look (ix (src, id_gem))
 >   aver (balance >= wad)
->
+
 >  -- Update balances
 >   decrease    (ix (src, id_gem)) wad
 >   initialize  (at (dst, id_gem)) 0
@@ -1334,7 +1334,7 @@ is how the stablecoin supply is reduced.
 > warp t = auth (do increase era t)
 
 > mine id_gem = do
->
+
 >     initialize (balances . at (Toy, id_gem)) 1000000000000
 
 > hand dst wad_gem id_gem = do
@@ -1454,20 +1454,20 @@ condition holds.
 
 > -- General assertion
 > aver x = unless x (throwError (AssertError ?act))
->
+
 > -- Assert that an indexed value is not present
 > none x = preuse x >>= \case
 >   Nothing -> return ()
 >   Just _  -> throwError (AssertError ?act)
->
+
 > -- Assert that an indexed value is present
 > look f = preuse f >>= \case
 >   Nothing -> throwError (AssertError ?act)
 >   Just x  -> return x
->
+
 > -- Execute an act and assert a condition on its result
 > want m p = m >>= (aver . p)
->
+
 > has p x = view p x /= Nothing
 
 <p>We define <code>owns id_urn id_lad</code> as an assertion that the
@@ -1493,35 +1493,35 @@ Sketches for property stuff...
 > {-
 > data Parameter =
 >      Wut | Par | Way
->
+
 > maintains
 >   :: Eq a  => Lens' System a -> Action ()
 >            -> System -> Bool
->
+
 > maintains p = \ m sys0 ->
 >   case exec sys0 m of
 >   -- On success, data must be compared for equality
 >     Right sys1  -> view p sys0 == view p sys1
 >   -- On rollback, data is maintained by definition
 >     Left _      -> True
->
+
 > changesOnly
 >   ::  Lens' System a -> Action ()
 >   ->  System -> Bool
->
+
 > changesOnly p = \m sys0 ->
 >   case exec sys0 m of
 >   -- On success, equalize |p| and compare
 >     Right sys1  -> set p (view p sys1) sys0 == sys1
 >   -- On rollback, data is maintained by definition
 >     Left _      -> True
->
+
 > also :: Lens' s a -> Lens' s b -> Lens' s (a, b)
 > also f g = lens getter setter
 >   where
 >   getter x = (view f x, view g x)
 >   setter x (a, b) = set f a (set g b x)
->
+
 > keeps :: Parameter -> Action () -> System -> Bool
 > keeps Wut  = maintains (vox . wut)
 > keeps Par  = maintains (vox . par)
