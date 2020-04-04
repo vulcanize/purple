@@ -1,4 +1,4 @@
-{ compiler ? "ghc865" }:
+{ }:
 let
   hostNixpkgs = import <nixpkgs> {};
 
@@ -31,7 +31,7 @@ let
 
   overlay = self: super: {
     haskellPackages =
-      super.haskell.packages.${compiler}.override (old: {
+      super.haskellPackages.override (old: {
         overrides = self.lib.composeExtensions (old.overrides or (_: _: {}))
           (self: super: {
             brick = self.callHackageDirect {
