@@ -17,9 +17,9 @@ intermediate results.
 %endif
 
 > module Maker.Decimal (Decimal (..), E18, E36, Epsilon (..)) where
->
+
 > import Data.Fixed
->
+
 > newtype HasResolution e => Decimal e = D (Fixed e)
 >   deriving (Ord, Eq, Real, RealFrac)
 
@@ -37,7 +37,7 @@ In the |Num| instance, we delegate everything except multiplication.
 >   x@(D (MkFixed a)) * D (MkFixed b) =
 >     D (MkFixed (div  (a * b + div (resolution x) 2)
 >                      (resolution x)))
-> 
+
 >   D a + D b      = D (a + b)
 >   D a - D b      = D (a - b)
 >   negate  (D a)  = D (negate a)
@@ -50,7 +50,7 @@ In the |Fractional| instance, we delegate everything except division.
 > instance HasResolution e => Fractional (Decimal e) where
 >   x@(D (MkFixed a)) / D (MkFixed b) =
 >     D (MkFixed (div (a * resolution x + div b 2) b))
-> 
+
 >   recip (D a)     = D (recip a)
 >   fromRational r  = D (fromRational r)
 
@@ -58,7 +58,7 @@ We define the |E18| and |E36| symbols and their fixed
 point multipliers.
 
 > data E18; data E36
->
+
 > instance HasResolution E18 where
 >   resolution _ = 10^(18 :: Integer)
 > instance HasResolution E36 where
@@ -68,8 +68,7 @@ The fixed point number types have well-defined smallest increments
 (denoted |epsilon|).  This becomes useful when verifying equivalences.
 
 > class Epsilon t where epsilon :: t
->
+
 > instance HasResolution a => Epsilon (Decimal a) where
 >   -- The use of |undefined| is safe since |resolution| ignores the value.
 >   epsilon = 1 / fromIntegral (resolution (undefined :: Fixed a))
-
