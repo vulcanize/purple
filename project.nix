@@ -34,12 +34,6 @@ let
       super.haskellPackages.override (old: {
         overrides = self.lib.composeExtensions (old.overrides or (_: _: {}))
           (self: super: {
-            brick = self.callHackageDirect {
-              pkg = "brick";
-              ver = "0.46";
-              sha256 = "1d08qsgz7i3ndfknc5nx9kvzjl1pm7is2cwi6i6h1gd4shdhz5yy";
-            } {};
-
             mkrfuzz = self.callCabal2nix "mkrfuzz" sources.mkrfuzz {};
           });
       });
