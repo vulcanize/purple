@@ -308,7 +308,7 @@ the other.
 <p>We define another type for representing Ethereum account addresses.
 
 > newtype Address = Address String
->   deriving (Eq, Ord, Show)
+>   deriving (Eq, Ord, Read, Show)
 
 <h2><code>Gem, SIN, DAI, MKR</code>: token identifiers</h2>
 
@@ -328,7 +328,7 @@ the other.
 >     -- Volatile countercoin and voting token
 >   | MKR
 
->   deriving (Eq, Ord, Show)
+>   deriving (Eq, Ord, Read, Show)
 
 <p>The system's approved collateral tokens are called "gems". We use
 the type <code>Id Tag</code> to denote the identity of some
@@ -470,7 +470,7 @@ that can hold a token balance or invoke actions.
 >     -- Omnipotent actor (temporary kludge)
 >   | God
 
->   deriving (Eq, Ord, Show)
+>   deriving (Eq, Ord, Read, Show)
 
 
 
@@ -1419,7 +1419,10 @@ represent invocations.
 >   |  Crop (Id Ilk) Ray
 >   |  Mint Token Wad Actor
 >   |  Drip (Id Ilk)
->  deriving (Eq, Show)
+>  deriving (Eq, Ord, Show, Read, Generic)
+
+> instance ToJSON Act
+> instance FromJSON Act
 
 -->
 
