@@ -11,6 +11,7 @@ intermediate results.
 
 %if 0
 
+> {-# Language DeriveGeneric #-}
 > {-# Language GeneralizedNewtypeDeriving #-}
 > {-# Language ScopedTypeVariables #-}
 
@@ -19,9 +20,10 @@ intermediate results.
 > module Maker.Decimal (Decimal (..), E18, E36, Epsilon (..)) where
 
 > import Data.Fixed
+> import GHC.Generics
 
-> newtype HasResolution e => Decimal e = D (Fixed e)
->   deriving (Ord, Eq, Real, RealFrac)
+> newtype Decimal e = D (Fixed e)
+>   deriving (Ord, Eq, Real, RealFrac, Generic)
 
 We want the printed representations of these numbers to look like
 |"0.01"| and not |"R 0.01"|.
