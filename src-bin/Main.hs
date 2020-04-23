@@ -36,7 +36,7 @@ instance ParseRecord Sec where
 
 data Command
   = Init
-  
+
   | Open { lad :: String, urn :: String, ilk :: String }
   | Give { urn :: String, lad :: String }
   | Lock { urn :: String, wad :: Wad }
@@ -44,22 +44,22 @@ data Command
   | Draw { urn :: String, dai :: Wad }
   | Wipe { urn :: String, dai :: Wad }
   | Shut { urn :: String }
-  
+
   | Prod
   | Drip { ilk :: String }
-  
+
   | Mark { gem :: String, tag :: Wad, zzz :: Sec }
   | Tell { sdr :: Wad }
 
   | Bite { urn :: String }
   | Grab { urn :: String }
   | Plop { urn :: String, wad :: Wad }
-  
+
   | Form { ilk :: String, gem :: String }
   | Frob { how :: Ray }
   | Warp { era :: Sec }
   | Mint { gem :: String, wad :: Wad, lad :: String }
-  
+
   | Cuff { ilk :: String, mat :: Ray }
   | Chop { ilk :: String, axe :: Ray }
   | Cork { ilk :: String, hat :: Wad }
@@ -79,7 +79,7 @@ main = do
          Left e -> error e
          Right Nothing -> error "error"
          Right (Just sys) -> do
-           let run e m = 
+           let run e m =
                  case exec sys (being e (perform m)) of
                    Left x -> do
                      hPrint stderr x
@@ -93,10 +93,10 @@ main = do
                  case view (urns . at (Id x)) sys of
                    Nothing -> error "no such urn"
                    Just y -> Account (view Dai.lad y)
-                   
+
            case x of
              Init -> error "not possible"
-             
+
              Open x y z -> run (Account (Address x)) $
                Dai.Open (Id y) (Id z)
              Give x y -> run (who x) $
@@ -111,12 +111,12 @@ main = do
                Dai.Wipe (Id x) y
              Shut x -> run (who x) $
                Dai.Shut (Id x)
-               
+
              Prod -> run God $
                Dai.Prod
              Drip x -> run God $
                Dai.Drip (Id x)
-               
+
              Form x y -> run God $
                Dai.Form (Id x) (Id y)
              Mark x y z -> run God $

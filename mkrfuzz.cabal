@@ -10,51 +10,28 @@ build-type:
   Simple
 
 library
+  hs-source-dirs: src
   exposed-modules:
     Maker,
     Maker.Prelude,
     Maker.Decimal
   build-depends:
     aeson,
-    bytestring,
-    HUnit,
-    QuickCheck,
     base < 5,
     containers,
-    ghci-pretty,
     lens,
-    mtl,
-    wl-pprint-text,
-    random,
-    tasty,
-    tasty-hunit,
-    tasty-quickcheck,
-    text,
-    optparse-generic,
-    hevm
+    mtl
   default-language:
     Haskell2010
 
 executable dai
+  hs-source-dirs: src-bin
   default-language:
     Haskell2010
   build-depends:
-    aeson,
-    bytestring,
-    QuickCheck,
     base < 5,
-    containers,
-    ghci-pretty,
-    lens,
+    bytestring,
     mkrfuzz,
-    mtl,
-    wl-pprint-text,
-    random,
-    tasty,
-    tasty-hunit,
-    tasty-quickcheck,
-    text,
     optparse-generic
   main-is:
     Main.hs
-  

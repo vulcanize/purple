@@ -27,44 +27,44 @@ This module reexports symbols from other packages and exports a few
 new symbols of its own.
 
 > module Maker.Prelude (module Maker.Prelude, module X) where
->
+
 > import Prelude as X (
->
+
 > -- Conversions to and from strings
 >   Read (..), Show (..), read,
->
+
 > -- Comparisons
 >   Eq (..), Ord (..),
->
+
 > -- Core abstractions
 >   Functor      (fmap),
 >   Applicative  (),
 >   Monad        (return, (>>=)),
->
+
 > -- Numeric classes
 >   Num (..), Integral (), Enum (),
->
+
 > -- Numeric conversions
 >   Real (..), Fractional (..),
 >   RealFrac (..),
 >   fromIntegral,
->
+
 > -- Simple types
 >   Integer, Int, String,
->
+
 > -- Algebraic types
 >   Bool    (True, False),
 >   Maybe   (Just, Nothing),
 >   Either  (Right, Left),
->
+
 > -- Functional operators
 >   (.), ($),
 > -- Numeric operators
 >   (+), (-), (*), (/), (^), (^^), div,
->
+
 > -- Utilities
 >   all, not, elem, (&&),
->
+
 > -- Constants
 >   mempty, undefined, otherwise)
 
@@ -77,14 +77,14 @@ See section~\ref{section:maker-monad} (\textit{The Maker monad}).
 >   execStateT,          -- Runs a state monad with given initial state
 >   get,                 -- Gets the state in a |do| block
 >   put)                 -- Sets the state in a |do| block
->
+
 > import Control.Monad.Writer as X (
 >   WriterT,             -- Type constructor that adds logging to a monad type
 >   Writer,              -- Type constructor of logging monads
 >   runWriterT,          -- Runs a writer monad transformer
 >   execWriterT,         -- Runs a writer monad transformer keeping only logs
 >   execWriter)          -- Runs a writer monad keeping only logs
->
+
 > import Control.Monad.Except as X (
 >   MonadError,          -- Type class of monads that fail
 >   Except,              -- Type constructor of failing monads
@@ -115,9 +115,9 @@ http://www.haskellforall.com/2013/05/program-imperatively-using-haskell.html
 %endif
 
 > import Control.Lens as X (
->
+
 >   Lens', lens,
->
+
 >   makeLenses,        -- Defines lenses for record fields
 >   makeFields,        -- Defines lenses for record fields
 >   set,               -- Writes a lens
@@ -125,13 +125,13 @@ http://www.haskellforall.com/2013/05/program-imperatively-using-haskell.html
 >   view,              -- Reads a lens from a value
 >   ix,                -- Lens for map retrieval and updating
 >   at,                -- Lens for map insertion
->
+
 > -- Operators for partial state updates in |do| blocks:
 >   (.=), assign,      -- Replace
 >   (-=), (+=),        -- Update arithmetically
 >   (%=),              -- Update according to function
 >   (?=))              -- Insert into map
->
+
 > import Control.Lens.Zoom as X (zoom)
 
 Where the Solidity code uses \texttt{mapping}, we use Haskell's
@@ -162,5 +162,5 @@ Finally we define some of our own convenience functions.
 > increase    a x = a +=  x
 > initialize  a x = a %=  (\case Nothing -> Just x; y -> y)
 > prepend     a x = a %=  (x :)
-> 
+
 > oneOf  xs x = elem x xs
