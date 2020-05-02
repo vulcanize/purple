@@ -1231,18 +1231,16 @@ debt unit.
 the concept of &raquo;allowance&laquo;).
 
 > transfer id_gem wad src dst =
-
 >  -- Operate in the token's balance table
 >   zoom balances $ do
+>    -- Fail if source balance insufficient
+>     balance <- look (ix (src, id_gem))
+>     aver (balance >= wad)
 
->  -- Fail if source balance insufficient
->   balance <- look (ix (src, id_gem))
->   aver (balance >= wad)
-
->  -- Update balances
->   decrease    (ix (src, id_gem)) wad
->   initialize  (at (dst, id_gem)) 0
->   increase    (ix (dst, id_gem)) wad
+>    -- Update balances
+>     decrease    (ix (src, id_gem)) wad
+>     initialize  (at (dst, id_gem)) 0
+>     increase    (ix (dst, id_gem)) wad
 
 > transferAll id_gem src dst = do
 >   wad <- look (balance id_gem src)
