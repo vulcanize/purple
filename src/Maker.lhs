@@ -1366,6 +1366,11 @@ is how the stablecoin supply is reduced.
 >     Calm ilk sec     -> calm ilk sec
 >     Crop ilk ray     -> crop ilk ray
 >     Mint gem wad lad -> mint gem wad lad
+>     Wipe urn wad     -> wipe urn wad
+>     Free urn wad     -> free urn wad
+>     Bite urn         -> bite urn
+>     Grab urn         -> grab urn
+>     Shut urn         -> shut urn
 
 > being :: Actor -> Action () -> Action ()
 > being who x = do
