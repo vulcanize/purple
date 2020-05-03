@@ -236,6 +236,7 @@ briefly explains each imported type and function.
 
 <!--
 
+> import qualified Control.Monad.Writer as W
 > import Debug.Trace
 > import Data.Aeson.Types (fieldLabelModifier, defaultOptions, genericParseJSON, genericToJSON)
 > import Prelude (drop)
@@ -620,7 +621,7 @@ an ilk.
 >   id_sender <- use sender
 >   id_lad <- case id_sender of
 >     Account id_lad -> return id_lad
->     _ -> throwError (AssertError ?act)
+>     _ -> throwError (AssertError ?act "Account not found")
 >   initialize (urns . at id_urn) (emptyUrn id_ilk id_lad)
 
 <p>The owner of an urn can transfer its ownership at any time using
@@ -640,22 +641,27 @@ lock more collateral.
 
 > lock id_urn wad_gem = do
 
+>   log "lock start"
 >  -- Fail if sender is not the CDP owner
 >   id_lad <- use sender
+>   log "lock got lad"
 >   owns id_urn id_lad
-
+>   log "lock owns"
 >  -- Fail if liquidation in process
 >   want (feel id_urn) (not . oneOf [Grief, Dread])
-
+>   log "lock wants"
 >  -- Identify collateral token
 >   id_ilk  <- look (urns . ix id_urn . ilk)
+>   log "lock look ilk"
 >   id_tag  <- look (ilks . ix id_ilk . gem)
-
+>   log "lock look tag"
 >  -- Take custody of collateral
 >   transfer (Gem id_tag) wad_gem id_lad Jar
-
+>   log "lock transfer"
 >  -- Record an collateral token balance increase
 >   increase (urns . ix id_urn . ink) wad_gem
+
+>   log "lock end"
 
 <p>When a CDP has no risk problems (except that its ilk's ceiling may
 be exceeded), its owner can use <code>free</code> to reclaim some
@@ -909,19 +915,26 @@ is updated.
 
 >  -- Adjust target price and target rate
 >   prod
-
+>   log "feel: prod"
 >  -- Update debt unit and unprocessed fee revenue
 >   id_ilk <- look (urns . ix id_urn . ilk)
+>   log "feel: ilk"
 >   drip id_ilk
-
+>   log "feel: drip"
 >  -- Read parameters for stage analysis
 >   era0 <- use era
+>   log "feel: era"
 >   par0 <- use (vox . par)
+>   log "feel: par"
 >   urn0 <- look (urns . ix id_urn)
+>   log "feel: urn"
 >   ilk0 <- look (ilks . ix (view ilk urn0))
+>   log "feel: ilk"
 >   tag0 <- look (tags . ix (view gem ilk0))
-
+>   log "feel: tag"
 >  -- Return lifecycle stage of CDP
+>   let lol = analyze era0 par0 urn0 ilk0 tag0
+>   log $ "feel: " <> show lol
 >   return (analyze era0 par0 urn0 ilk0 tag0)
 
 <p>CDP actions use <code>feel</code> to prohibit increasing risk when
@@ -1226,17 +1239,22 @@ debt unit.
 <p>We model the ERC20 transfer function in simplified form (omitting
 the concept of &raquo;allowance&laquo;).
 
-> transfer id_gem wad src dst =
+> transfer id_gem wad src dst = do
+>   log "transfer start"
 >  -- Operate in the token's balance table
 >   zoom balances $ do
+>     log "transfer zoomed balances"
 >    -- Fail if source balance insufficient
 >     balance <- look (ix (src, id_gem))
+>     log "transfer balance"
 >     aver (balance >= wad)
-
+>     log "transfer aver"
 >    -- Update balances
 >     decrease    (ix (src, id_gem)) wad
 >     initialize  (at (dst, id_gem)) 0
 >     increase    (ix (dst, id_gem)) wad
+
+>     log "transfer end"
 
 > transferAll id_gem src dst = do
 >   wad <- look (balance id_gem src)
@@ -1439,12 +1457,18 @@ monad to provide the semantics we want.
 <p>This defines the <code>Action</code> monad as a simple composition
 of a state monad and an error monad:
 
-> type Action a = StateT System (Except Error) a
+> data Log = Log String deriving (Eq, Ord, Read, Show, Generic)
+> instance ToJSON Log
+> instance FromJSON Log
+
+> log l = W.tell [Log l]
+
+> type Action a = StateT System (ExceptT Error (Writer [Log])) a
 
 <p>We divide act failure modes into general assertion failures and
 authentication failures.
 
-> data Error = AssertError Act | AuthError
+> data Error = AssertError Act String | AuthError
 >   deriving (Show, Eq)
 
 <p>An act can be executed on a given initial system state using
@@ -1452,8 +1476,8 @@ authentication failures.
 The <code>exec</code> function can also accept a sequence of actions,
 which will be interpreted as a single transaction.
 
-> exec :: System -> Action () -> Either Error System
-> exec sys m = runExcept (execStateT m sys)
+> exec :: System -> Action () -> (Either Error System, [Log])
+> exec sys m = W.runWriter (runExceptT (execStateT m sys))
 
 <h2>Asserting</h2>
 
@@ -1461,16 +1485,16 @@ which will be interpreted as a single transaction.
 condition holds.
 
 > -- General assertion
-> aver x = unless x (throwError (AssertError ?act))
+> aver x = unless x (throwError (AssertError ?act $ "aver"))
 
 > -- Assert that an indexed value is not present
 > none x = preuse x >>= \case
 >   Nothing -> return ()
->   Just _  -> throwError (AssertError ?act)
+>   Just _  -> throwError (AssertError ?act "none")
 
 > -- Assert that an indexed value is present
 > look f = preuse f >>= \case
->   Nothing -> throwError (AssertError ?act)
+>   Nothing -> throwError (AssertError ?act "look")
 >   Just x  -> return x
 
 > -- Execute an act and assert a condition on its result

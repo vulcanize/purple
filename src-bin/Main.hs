@@ -5,7 +5,7 @@ module Main where
 
 import System.IO (hPrint, stderr)
 
-import Prelude (error)
+import Prelude (error, fst)
 
 import Maker.Prelude
 
@@ -80,7 +80,7 @@ main = do
          Right Nothing -> error "error"
          Right (Just sys) -> do
            let run e m =
-                 case exec sys (being e (perform m)) of
+                 case fst $ exec sys (being e (perform m)) of
                    Left x -> do
                      hPrint stderr x
                      putStrLn (encode (Nothing :: Maybe System))

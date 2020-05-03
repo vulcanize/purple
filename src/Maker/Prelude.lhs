@@ -73,6 +73,7 @@ We use a typical composition of monad transformers from the
 See section~\ref{section:maker-monad} (\textit{The Maker monad}).
 
 > import Control.Monad.State as X (
+>   MonadState,
 >   StateT,              -- Type constructor that adds state to a monad type
 >   execStateT,          -- Runs a state monad with given initial state
 >   get,                 -- Gets the state in a |do| block
@@ -86,6 +87,8 @@ See section~\ref{section:maker-monad} (\textit{The Maker monad}).
 >   execWriter)          -- Runs a writer monad keeping only logs
 
 > import Control.Monad.Except as X (
+>   ExceptT,
+>   runExceptT,
 >   MonadError,          -- Type class of monads that fail
 >   Except,              -- Type constructor of failing monads
 >   throwError,          -- Short-circuits the monadic computation
