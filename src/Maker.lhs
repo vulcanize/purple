@@ -303,7 +303,7 @@ the other.
 <code>Id Urn</code>, and so on, as distinct identifier types.
 
 > newtype Id a = Id String
->   deriving (Eq, Ord, Show)
+>   deriving (Eq, Ord, Read, Show)
 
 <p>We define another type for representing Ethereum account addresses.
 
@@ -476,9 +476,6 @@ that can hold a token balance or invoke actions.
 
 
 <!--
-
-> instance Read (Id a) where
->   readsPrec n s = fmap (first Id) (readsPrec n s)
 
 > deriving instance Generic Wad
 > deriving instance Generic Ray
