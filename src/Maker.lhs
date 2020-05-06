@@ -1101,10 +1101,9 @@ to sell and restore the CDP.
 >   assign (urns . ix id_urn . cat) Nothing
 
 >  -- Take excess collateral from settler to vault
->   id_vow <- use sender
 >   id_ilk <- look (urns . ix id_urn . ilk)
 >   id_tag <- look (ilks . ix id_ilk . gem)
->   transfer (Gem id_tag) wad_dai id_vow Jar
+>   transfer (Gem id_tag) wad_dai Vow Jar
 
 >  -- Record the excess collateral as belonging to the CDP
 >   assign (urns . ix id_urn . ink) wad_dai
@@ -1371,6 +1370,8 @@ is how the stablecoin supply is reduced.
 >     Bite urn         -> bite urn
 >     Grab urn         -> grab urn
 >     Shut urn         -> shut urn
+>     Loot             -> loot
+>     Plop urn wad     -> plop urn wad
 
 > being :: Actor -> Action () -> Action ()
 > being who x = do
@@ -1400,7 +1401,7 @@ represent invocations.
 >   |  Give     (Id Urn)  Address
 >   |  Grab     (Id Urn)
 >   |  Lock     (Id Urn)  Wad
->   |  Loot     Wad
+>   |  Loot
 >   |  Mark     (Id Tag)  Wad  Sec
 >   |  Open     (Id Urn)  (Id Ilk)
 >   |  Prod
@@ -1410,7 +1411,7 @@ represent invocations.
 >   |  Mine (Id Tag)
 >   |  Hand Address Wad Token
 >   |  Sire Address
->   |  Addr Address
+>  --  Addr Address
 >   |  Warp Sec
 >   |  Cuff (Id Ilk) Ray
 >   |  Chop (Id Ilk) Ray
@@ -1419,6 +1420,7 @@ represent invocations.
 >   |  Crop (Id Ilk) Ray
 >   |  Mint Token Wad Actor
 >   |  Drip (Id Ilk)
+>   |  Plop (Id Urn) Wad
 >  deriving (Eq, Ord, Show, Read, Generic)
 
 > instance ToJSON Act
