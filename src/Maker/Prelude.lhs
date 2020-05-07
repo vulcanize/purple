@@ -75,6 +75,7 @@ See section~\ref{section:maker-monad} (\textit{The Maker monad}).
 > import Control.Monad.State as X (
 >   StateT,              -- Type constructor that adds state to a monad type
 >   execStateT,          -- Runs a state monad with given initial state
+>   evalStateT,
 >   get,                 -- Gets the state in a |do| block
 >   put)                 -- Sets the state in a |do| block
 

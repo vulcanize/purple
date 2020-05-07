@@ -303,7 +303,7 @@ the other.
 <code>Id Urn</code>, and so on, as distinct identifier types.
 
 > newtype Id a = Id String
->   deriving (Eq, Ord, Show)
+>   deriving (Eq, Ord, Read, Show)
 
 <p>We define another type for representing Ethereum account addresses.
 
@@ -476,9 +476,6 @@ that can hold a token balance or invoke actions.
 
 
 <!--
-
-> instance Read (Id a) where
->   readsPrec n s = fmap (first Id) (readsPrec n s)
 
 > deriving instance Generic Wad
 > deriving instance Generic Ray
@@ -741,7 +738,7 @@ its liquidation ratio.
 >   decrease (ilks . ix id_ilk . rum) wad_chi
 
 >  -- Take custody of stablecoin from CDP owner
->   transfer DAI wad_dai id_lad Jar
+>   transfer DAI wad_dai id_lad Jug
 
 >  -- Destroy stablecoin and anticoin
 >   mend wad_dai
@@ -917,6 +914,9 @@ is updated.
 >   id_ilk <- look (urns . ix id_urn . ilk)
 >   drip id_ilk
 
+>   currentStage id_urn
+
+> currentStage id_urn = do
 >  -- Read parameters for stage analysis
 >   era0 <- use era
 >   par0 <- use (vox . par)
@@ -1104,10 +1104,9 @@ to sell and restore the CDP.
 >   assign (urns . ix id_urn . cat) Nothing
 
 >  -- Take excess collateral from settler to vault
->   id_vow <- use sender
 >   id_ilk <- look (urns . ix id_urn . ilk)
 >   id_tag <- look (ilks . ix id_ilk . gem)
->   transfer (Gem id_tag) wad_dai id_vow Jar
+>   transfer (Gem id_tag) wad_dai Vow Jar
 
 >  -- Record the excess collateral as belonging to the CDP
 >   assign (urns . ix id_urn . ink) wad_dai
@@ -1231,18 +1230,16 @@ debt unit.
 the concept of &raquo;allowance&laquo;).
 
 > transfer id_gem wad src dst =
-
 >  -- Operate in the token's balance table
 >   zoom balances $ do
+>    -- Fail if source balance insufficient
+>     balance <- look (ix (src, id_gem))
+>     aver (balance >= wad)
 
->  -- Fail if source balance insufficient
->   balance <- look (ix (src, id_gem))
->   aver (balance >= wad)
-
->  -- Update balances
->   decrease    (ix (src, id_gem)) wad
->   initialize  (at (dst, id_gem)) 0
->   increase    (ix (dst, id_gem)) wad
+>    -- Update balances
+>     decrease    (ix (src, id_gem)) wad
+>     initialize  (at (dst, id_gem)) 0
+>     increase    (ix (dst, id_gem)) wad
 
 > transferAll id_gem src dst = do
 >   wad <- look (balance id_gem src)
@@ -1371,6 +1368,14 @@ is how the stablecoin supply is reduced.
 >     Calm ilk sec     -> calm ilk sec
 >     Crop ilk ray     -> crop ilk ray
 >     Mint gem wad lad -> mint gem wad lad
+>     Wipe urn wad     -> wipe urn wad
+>     Free urn wad     -> free urn wad
+>     Bite urn         -> bite urn
+>     Grab urn         -> grab urn
+>     Shut urn         -> shut urn
+>     Loot             -> loot
+>     Plop urn wad     -> plop urn wad
+>     Eval             -> return ()
 
 > being :: Actor -> Action () -> Action ()
 > being who x = do
@@ -1400,7 +1405,7 @@ represent invocations.
 >   |  Give     (Id Urn)  Address
 >   |  Grab     (Id Urn)
 >   |  Lock     (Id Urn)  Wad
->   |  Loot     Wad
+>   |  Loot
 >   |  Mark     (Id Tag)  Wad  Sec
 >   |  Open     (Id Urn)  (Id Ilk)
 >   |  Prod
@@ -1410,7 +1415,7 @@ represent invocations.
 >   |  Mine (Id Tag)
 >   |  Hand Address Wad Token
 >   |  Sire Address
->   |  Addr Address
+>  --  Addr Address
 >   |  Warp Sec
 >   |  Cuff (Id Ilk) Ray
 >   |  Chop (Id Ilk) Ray
@@ -1419,6 +1424,8 @@ represent invocations.
 >   |  Crop (Id Ilk) Ray
 >   |  Mint Token Wad Actor
 >   |  Drip (Id Ilk)
+>   |  Plop (Id Urn) Wad
+>   |  Eval
 >  deriving (Eq, Ord, Show, Read, Generic)
 
 > instance ToJSON Act
@@ -1452,6 +1459,9 @@ which will be interpreted as a single transaction.
 
 > exec :: System -> Action () -> Either Error System
 > exec sys m = runExcept (execStateT m sys)
+
+> getStage :: System -> Id Urn -> Either Error Stage
+> getStage sys urnId = let ?act = Eval in runExcept $ evalStateT (currentStage urnId) sys
 
 <h2>Asserting</h2>
 
