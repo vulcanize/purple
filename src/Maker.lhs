@@ -738,7 +738,7 @@ its liquidation ratio.
 >   decrease (ilks . ix id_ilk . rum) wad_chi
 
 >  -- Take custody of stablecoin from CDP owner
->   transfer DAI wad_dai id_lad Jar
+>   transfer DAI wad_dai id_lad Jug
 
 >  -- Destroy stablecoin and anticoin
 >   mend wad_dai
