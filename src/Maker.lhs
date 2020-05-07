@@ -914,6 +914,9 @@ is updated.
 >   id_ilk <- look (urns . ix id_urn . ilk)
 >   drip id_ilk
 
+>   currentStage id_urn
+
+> currentStage id_urn = do
 >  -- Read parameters for stage analysis
 >   era0 <- use era
 >   par0 <- use (vox . par)
@@ -1372,6 +1375,7 @@ is how the stablecoin supply is reduced.
 >     Shut urn         -> shut urn
 >     Loot             -> loot
 >     Plop urn wad     -> plop urn wad
+>     Eval             -> return ()
 
 > being :: Actor -> Action () -> Action ()
 > being who x = do
@@ -1421,6 +1425,7 @@ represent invocations.
 >   |  Mint Token Wad Actor
 >   |  Drip (Id Ilk)
 >   |  Plop (Id Urn) Wad
+>   |  Eval
 >  deriving (Eq, Ord, Show, Read, Generic)
 
 > instance ToJSON Act
@@ -1454,6 +1459,9 @@ which will be interpreted as a single transaction.
 
 > exec :: System -> Action () -> Either Error System
 > exec sys m = runExcept (execStateT m sys)
+
+> getStage :: System -> Id Urn -> Either Error Stage
+> getStage sys urnId = let ?act = Eval in runExcept $ evalStateT (currentStage urnId) sys
 
 <h2>Asserting</h2>
 
